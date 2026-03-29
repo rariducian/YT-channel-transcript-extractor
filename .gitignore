@@ -1,0 +1,4 @@
+transcripts/vtt/
+__pycache__/
+*.pyc
+.env

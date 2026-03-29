@@ -1,0 +1,10 @@
+{
+  "name": "YT Transcript Extractor",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "pip install yt-dlp",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
