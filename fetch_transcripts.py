@@ -20,7 +20,8 @@ import sys
 from pathlib import Path
 
 import yt_dlp
-from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api._errors import NoTranscriptFound, TranscriptsDisabled
 
 CHANNELS_FILE = Path("channels.json")
 OUTPUT_ROOT   = Path("transcripts")
@@ -95,20 +96,19 @@ def fetch_transcript(video: dict, out_dir: Path) -> bool:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        ytt = YouTubeTranscriptApi()
+        transcript_list = ytt.list_transcripts(video_id)
 
-        # prefer manual english, fallback to auto-generated, fallback to any+translate
         try:
             transcript = transcript_list.find_manually_created_transcript(["en"])
         except NoTranscriptFound:
             try:
                 transcript = transcript_list.find_generated_transcript(["en", "en-US"])
             except NoTranscriptFound:
-                # grab whatever's available and translate
                 transcript = next(iter(transcript_list)).translate("en")
 
         segments = transcript.fetch()
-        plain    = " ".join(s.text for s in segments).strip()
+        plain = " ".join(s.text for s in segments).strip()
 
     except TranscriptsDisabled:
         print(f"  ⚠  Transcripts disabled: {video['title'][:60]}")
